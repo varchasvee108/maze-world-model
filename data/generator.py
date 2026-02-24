@@ -57,3 +57,33 @@ class MazeTransitionGenerator:
 
     def _reverse_action(self, action):
         return {0: 1, 1: 0, 2: 3, 3: 2}[action]
+
+    def generate_policy_samples(self):
+        maze = self.generate_solvable_maze()
+        free_cells = np.argwhere(maze == 0)
+        exit_idx = np.random.choice(len(free_cells))
+        exit_pos = tuple(free_cells[exit_idx])
+
+        policy = self._get_valid_path(maze, exit_pos)
+
+        samples = []
+
+        for x, y in free_cells:
+            start_pos = (x, y)
+
+            if start_pos == exit_pos:
+                continue
+
+            if start_pos not in policy:
+                continue
+
+            samples.append(
+                {
+                    "maze": maze,
+                    "start": start_pos,
+                    "exit": exit_pos,
+                    "label": policy[start_pos],
+                }
+            )
+
+        return samples
