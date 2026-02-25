@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 
 
 class MazeRenderer:
-    def __init__(self, grid_size=10, image_size=(100, 100)):
+    def __init__(self, grid_size=11, image_size=(110, 110)):
         self.image_size = image_size
         self.grid_size = grid_size
 
