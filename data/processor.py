@@ -40,7 +40,7 @@ def generate_full_dataset(
         samples=np.array(maze_info, dtype=np.uint32),
     )
 
-    print(f"\n Done! Saved {len(maze_info)} total samples")
+    print(f"\n Mazes generated successfully! Saved {len(maze_info)} total samples")
 
 
 if __name__ == "__main__":
