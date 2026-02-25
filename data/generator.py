@@ -31,7 +31,7 @@ class MazeTransitionGenerator:
     def _get_valid_path(self, maze, exit_pos):
         N = self.grid_size
         queue = deque([exit_pos])
-        visited = set([exit_pos])
+        visited = {exit_pos}
 
         policy = {}
 
