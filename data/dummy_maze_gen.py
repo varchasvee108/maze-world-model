@@ -1,20 +1,23 @@
 from data.generator import MazeTransitionGenerator
 from data.renderer import MazeRenderer
 
-gen = MazeTransitionGenerator(grid_size=10)
-rend = MazeRenderer(image_size=(300, 300), grid_size=10)
+gen = MazeTransitionGenerator(grid_size=11)
+rend = MazeRenderer(grid_size=11, image_size=(440, 440))
 
-# 2. Get data
-transitions = gen.get_maze_transitions()
-first_step = transitions[0]
+samples = gen.generate_policy_samples()
 
-# 3. Render
-image = rend.render(
-    maze=first_step["maze"],
-    agent_pos=first_step["start"],
-    exit_pos=first_step["exit"],
-)
+if samples:
+    print(f"These are the samples: {len(samples)}")
+    first_step = samples[0]
 
-# 4. Save and look at it!
-image.save("test_maze.png")
-print(f"Action tried: {first_step['action']} | Outcome label: {first_step['label']}")
+    image = rend.render(
+        maze=first_step["maze"],
+        agent_pos=first_step["start"],
+        exit_pos=first_step["exit"],
+    )
+
+    image.save("test_maze.png")
+
+    action_names = {0: "UP", 1: "DOWN", 2: "LEFT", 3: "RIGHT"}
+    print(f"Start: {first_step['start']} | Exit: {first_step['exit']}")
+    print(f"Action: {action_names[first_step['label']]}")
