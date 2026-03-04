@@ -37,3 +37,16 @@ class MazeDataModule(L.LightningDataModule):
 
         self.train_dataset = Subset(full_dataset, train_indices)
         self.val_dataset = Subset(full_dataset, val_indices)
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=4
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4
+        )
+
+    def test_dataloader(self):
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False)
