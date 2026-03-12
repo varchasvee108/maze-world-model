@@ -9,7 +9,7 @@ from pathlib import Path
 class MazeVisionDataset(Dataset):
     def __init__(self, npz_path: str, img_size=(132, 132)):
         path = Path(npz_path)
-        data = np.load(path)
+        data = np.load(path, mmap_mode="r")
         self.mazes = data["mazes"]
         self.exits = data["exits"]
         self.samples = data["samples"]
