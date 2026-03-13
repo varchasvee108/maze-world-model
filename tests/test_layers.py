@@ -26,11 +26,11 @@ def test_patch_embedding():
 
 
 def test_pos_embd():
-    B, T, C = 2, 121, 256
+    B, T, C = 2, 122, 256
 
     grid_size = 11
 
-    pos_layer = PositionEmbedding(num_patches=T, n_embd=C, grid_size=grid_size)
+    pos_layer = PositionEmbedding(num_patches=121, n_embd=C, grid_size=grid_size)
     x = torch.zeros(B, T, C)
     out = pos_layer(x)
 
@@ -54,6 +54,12 @@ def test_maze_transformer():
 
     assert logits.shape == (x.shape[0], 4), (
         f"Expected output shape to be {x.shape[0], 4}, got {logits.shape}"
+    )
+
+    logits, attn = model(x, return_attn=True)
+    assert isinstance(attn, list), f"Expected attn to be a list, got {type(attn)}"
+    assert len(attn) == config.model.num_layers, (
+        f"Expected attn to have {config.model.num_layers} elements, got {len(attn)}"
     )
 
     print("Maze transformer test passed")
