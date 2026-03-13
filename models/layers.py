@@ -71,7 +71,7 @@ class TransformerBlock(nn.Module):
             norm_x,
             norm_x,
             norm_x,
-            need_weights=True,
+            need_weights=return_attn,
         )
 
         x = x + attn_out
