@@ -30,6 +30,7 @@ class PositionEmbedding(nn.Module):
         self.n_embd = n_embd
         self.row_embd = nn.Parameter(torch.randn(grid_size, n_embd) * 0.02)
         self.col_embd = nn.Parameter(torch.randn(grid_size, n_embd) * 0.02)
+        self.cls_token_embd = nn.Parameter(torch.randn(1, 1, n_embd) * 0.02)
 
     def forward(self, x):
         B, T, C = x.shape
@@ -37,5 +38,7 @@ class PositionEmbedding(nn.Module):
         col_embd = self.col_embd.unsqueeze(0)
 
         pos_embd = row_embd + col_embd
-        pos_embd = pos_embd.view(-1, C)
-        return x + pos_embd.unsqueeze(0)
+        pos_embd = pos_embd.view(1, -1, C)
+        cls_embd = self.cls_token_embd
+        final_pos_embd = torch.cat([cls_embd, pos_embd], dim=1)
+        return x + final_pos_embd
