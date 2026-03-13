@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import lightning as L
-from models.layers import PatchEmbedding, PositionEmbedding
+from models.layers import PatchEmbedding, PositionEmbedding, TransformerBlock
 from transformers import get_scheduler
 from core.config import Config
 
@@ -19,6 +19,8 @@ class MazeTransformer(L.LightningModule):
             patch_size=config.model.patch_size,
         )
 
+        self.cls_token = nn.Parameter(torch.randn(1, 1, config.model.n_embd) * 0.02)
+
         grid_size = config.input_data.image_size[0] // config.model.patch_size
 
         self.pos_embd = PositionEmbedding(
@@ -27,32 +29,38 @@ class MazeTransformer(L.LightningModule):
             grid_size=grid_size,
         )
 
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=config.model.n_embd,
-            nhead=config.model.num_heads,
-            dim_feedforward=config.model.n_embd * config.model.dim_ratio,
-            dropout=config.model.dropout,
-            activation="gelu",
-            batch_first=True,
-            norm_first=True,
-        )
-
-        self.transformer = nn.TransformerEncoder(
-            encoder_layer=encoder_layer,
-            num_layers=config.model.num_layers,
+        self.blocks = nn.ModuleList(
+            [TransformerBlock(config=config) for _ in range(config.model.num_layers)]
         )
 
         self.ln_f = nn.LayerNorm(config.model.n_embd)
         self.head = nn.Linear(config.model.n_embd, 4)
 
-    def forward(self, x):
+    def forward(self, x, return_attn=False):
+        B = x.shape[0]
 
         x = self.patch_embd(x)
-        x = self.pos_embd(x)
-        x = self.transformer(x)
-        x = x.mean(dim=1)
 
-        return self.head(self.ln_f(x))
+        cls_token = self.cls_token.expand(B, -1, -1)
+        x = torch.cat([cls_token, x], dim=1)
+        x = self.pos_embd(x)
+
+        attn_maps = []
+
+        for block in self.blocks:
+            if return_attn:
+                x, attn = block(x, return_attn=True)
+                attn_maps.append(attn)
+            else:
+                x = block(x)
+
+        x = self.ln_f(x)
+
+        logits = self.head(x[:, 0])
+
+        if return_attn:
+            return logits, attn_maps
+        return logits
 
     def training_step(self, batch, batch_idx):
         img, target = batch
