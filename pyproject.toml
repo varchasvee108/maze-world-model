@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=65"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spot-the-diff"
+version = "0.1.0"
+description = "Vision transformer for maze navigation"
+authors = [
+    { name = "Varchasvi", email = "varchasvi108@gmail.com" }
+]
+requires-python = ">=3.11"
+
+dependencies = [
+    "torch",
+    "torchvision",
+    "lightning",
+    "transformers",
+    "numpy",
+    "pillow",
+    "tqdm",
+    "wandb",
+    "plotly"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov"
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')"
+]
+testpaths = ["tests"]
+addopts = "-v"
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+include = [
+    "core",
+    "core.*",
+    "models",
+    "models.*",
+    "data",
+    "data.*",
+    "maze_dataset",
+    "maze_dataset.*"
+]
+
+exclude = [
+    "tests",
+    "tests.*",
+    "scripts",
+    "scripts.*",
+    "experiments"
+]
