@@ -1,11 +1,12 @@
 import torch
-import torch.nn.functional as F
 from core.config import Config
 from models.model import MazeTransformer
 from pathlib import Path
 import torch.nn as nn
+import pytest
 
 
+@pytest.mark.slow
 def test_sanity():
     config = Config.load(Path("config/base.toml"))
     model = MazeTransformer(config)
