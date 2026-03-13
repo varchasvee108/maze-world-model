@@ -16,8 +16,18 @@ def test_contract():
     dm.setup()
     model = MazeTransformer(config)
 
+    if torch.cuda.is_available():
+        model.to("cuda")
+
     batch = next(iter(dm.train_dataloader()))
     images, labels = batch
+
+    if torch.cuda.is_available():
+        images = images.to("cuda")
+        labels = labels.to("cuda")
+
+    print(f"DEBUG: Image is on device : {images.device}")
+    print(f"DEBUG: Label is on device : {labels[0].device}")
 
     try:
         assert isinstance(images, torch.Tensor), (
