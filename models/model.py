@@ -15,7 +15,7 @@ class MazeTransformer(L.LightningModule):
 
         self.patch_embd = PatchEmbedding(
             embd_dim=config.model.n_embd,
-            img_size=config.input_data.image_size,
+            img_size=config.input_data.image_size[0],
             patch_size=config.model.patch_size,
         )
 
