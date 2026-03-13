@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from core.config import Config
 
 
 class PatchEmbedding(nn.Module):
@@ -42,3 +43,34 @@ class PositionEmbedding(nn.Module):
         cls_embd = self.cls_token_embd
         final_pos_embd = torch.cat([cls_embd, pos_embd], dim=1)
         return x + final_pos_embd
+
+
+class TransformerBlock(nn.Module):
+    def __init__(self, config: Config):
+        super().__init__()
+        self.config = config
+        self.ln_1 = nn.LayerNorm(config.model.n_embd)
+        self.ln_2 = nn.LayerNorm(config.model.n_embd)
+        self.attn = nn.MultiheadAttention(
+            embed_dim=config.model.n_embd,
+            num_heads=config.model.num_heads,
+            dropout=config.model.dropout,
+            batch_first=True,
+        )
+        self.mlp = nn.Sequential(
+            nn.Linear(config.model.n_embd, 4 * config.model.n_embd),
+            nn.GELU(),
+            nn.Linear(4 * config.model.n_embd, config.model.n_embd),
+            nn.Dropout(config.model.dropout),
+        )
+
+    def forward(self, x, return_attn=False):
+        norm_x = self.ln_1(x)
+
+        attn_out, weights = self.attn(norm_x, norm_x, norm_x, need_weights=True)
+
+        x = x + attn_out
+
+        x = x + self.mlp(self.ln_2(x))
+
+        return (x, weights) if return_attn else x
