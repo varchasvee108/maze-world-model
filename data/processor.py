@@ -5,7 +5,7 @@ from data.generator import MazeTransitionGenerator
 
 
 def generate_full_dataset(
-    num_mazes=100000, grid_size=11, save_path="data/maze_data.npz"
+    num_mazes=10000, grid_size=11, save_path="data/maze_data.npz"
 ):
     generator = MazeTransitionGenerator(grid_size=grid_size)
     maze_library = []
