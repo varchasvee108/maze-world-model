@@ -13,6 +13,9 @@ def main():
     parser.add_argument(
         "--config", type=str, default="config/base.toml", help="Path to the config file"
     )
+    parser.add_argument(
+        "--ckpt_path", type=str, default=None, help="Path to the checkpoint file"
+    )
     args = parser.parse_args()
 
     config = Config.load(args.config)
@@ -28,11 +31,11 @@ def main():
     logger = WandbLogger(
         project=config.logging.project_name,
         name=config.project.experiment_name,
-        save_dir="experiments",
+        save_dir="outputs/wandb",
     )
 
     checkpoint = ModelCheckpoint(
-        dirpath="checkpoints",
+        dirpath="outputs/checkpoints",
         filename="maze-{step}-{val_loss:.3f}",
         monitor="val_loss",
         mode="min",
@@ -42,6 +45,7 @@ def main():
 
     trainer = L.Trainer(
         max_steps=config.training.max_steps,
+        val_check_interval=config.training.eval_interval,
         precision="16-mixed",
         gradient_clip_val=config.training.gradient_clipping,
         accelerator="auto",
@@ -50,11 +54,15 @@ def main():
             checkpoint,
             LearningRateMonitor(logging_interval="step"),
         ],
-        val_check_interval=config.training.eval_interval,
         log_every_n_steps=config.training.log_interval,
+        check_val_every_n_epoch=1000,
+        limit_val_batches=0.4,
     )
 
-    trainer.fit(model=model, datamodule=datamodule)
+    trainer.fit(
+        model=model, datamodule=datamodule, ckpt_path=args.ckpt_path, weights_only=False
+    )
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()
