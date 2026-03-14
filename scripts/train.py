@@ -1,5 +1,6 @@
 import argparse
 import lightning as L
+import torch
 from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
 
@@ -59,9 +60,13 @@ def main():
         limit_val_batches=0.4,
     )
 
-    trainer.fit(
-        model=model, datamodule=datamodule, ckpt_path=args.ckpt_path, weights_only=False
-    )
+    with torch.serialization.safe_globals([Config]):
+        trainer.fit(
+            model=model,
+            datamodule=datamodule,
+            ckpt_path=args.ckpt_path,
+            weights_only=False,
+        )
 
 
 if __name__ == "__main__":
