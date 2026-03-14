@@ -28,6 +28,21 @@ The system follows a Vision Transformer pipeline designed to emulate algorithmic
 5.  **Self-Attention Blocks**: Multiple layers of Multi-Head Self-Attention process the visual sequence, effectively "tracing" paths across tokens.
 6.  **Action Prediction**: Maps the final CLS token to four primary directions: Up, Down, Left, or Right.
 
+## Pretrained Model(70% accuracy)
+
+You can download the pretrained model checkpoint to try the inference and visualization directly:
+*   **Checkpoint**: [Google Drive Link](INSERT_LINK_HERE)
+
+Place the downloaded `.ckpt` file in the `outputs/checkpoints/` directory.
+
+## Training Performance
+
+The model's training progress is captured in the following loss and accuracy curves:
+
+| Train Loss | Validation Loss | Validation Accuracy |
+|:---:|:---:|:---:|
+| ![Train Loss](visuals/train_loss.png) | ![Validation Loss](visuals/val_loss.png) | ![Validation Accuracy](visuals/val_acc.png) |
+
 ## Getting Started
 
 ### Installation
